@@ -52,19 +52,10 @@ final class WhoisResult
      */
     public function urgencyLevel(): UrgencyLevel
     {
-        $days = $this->daysUntilExpiry();
-
-        if ($days === null) {
-            return UrgencyLevel::Unknown;
-        }
-
-        return match (true) {
-            $days < 0 => UrgencyLevel::Expired,
-            $days <= 14 => UrgencyLevel::Critical,
-            $days <= 30 => UrgencyLevel::Warning,
-            $days <= 60 => UrgencyLevel::Notice,
-            default => UrgencyLevel::Ok,
-        };
+        return UrgencyLevel::fromDays(
+            $this->daysUntilExpiry(),
+            config('domain-expiry.thresholds', ['critical' => 14, 'warning' => 30, 'notice' => 60]),
+        );
     }
 
     public function toArray(): array

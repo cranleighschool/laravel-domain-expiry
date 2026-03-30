@@ -19,12 +19,12 @@ class DomainExpiryController extends Controller
 
     public function index(): View
     {
-        return view('domain-expiry::dashboard', $this->getAllCheckManyAndSummarise());
+        return view('domain-expiry::dashboard', $this->buildDashboardData());
     }
 
     public function json(): JsonResponse
     {
-        ['results' => $results, 'summary' => $summary] = $this->getAllCheckManyAndSummarise();
+        ['results' => $results, 'summary' => $summary] = $this->buildDashboardData();
 
         return response()->json([
             'generated_at' => now()->toIso8601String(),
@@ -36,7 +36,7 @@ class DomainExpiryController extends Controller
     /**
      * @return array{results: Collection, summary: array<string, int>}
      */
-    private function getAllCheckManyAndSummarise(): array
+    private function buildDashboardData(): array
     {
         $domains = Domain::query()->active()->pluck('domain')->all();
         $results = $this->service->checkMany($domains);
@@ -49,7 +49,7 @@ class DomainExpiryController extends Controller
     {
         $domain = $request->string('domain')->toString();
 
-        if (blank($domain)) {
+        if (blank($domain) || ! preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}$/', $domain)) {
             return redirect()->route('domain-expiry.index');
         }
 

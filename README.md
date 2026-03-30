@@ -137,6 +137,63 @@ $urgent = DomainExpiry::expiringSoon(['example.com', 'example.co.uk'], withinDay
 $fresh = DomainExpiry::refresh('example.com');
 ```
 
+### Importing domains from registrars
+
+Pull all domains from your configured registrars and upsert them into the database:
+
+```bash
+php artisan domain-expiry:registrar-import
+```
+
+The package ships with [Gandi](https://www.gandi.net) and [Porkbun](https://porkbun.com) support. Set your credentials in `.env`:
+
+```env
+GANDI_ORGANISATION_API_KEY=your-key-here
+PORKBUN_API_KEY=your-key-here
+PORKBUN_SECRET_API_KEY=your-secret-here
+```
+
+#### Adding a custom registrar
+
+Implement `RegistrarInterface` and tag it in your service provider — the import command picks it up automatically alongside the built-in registrars.
+
+**1. Implement the interface**
+
+```php
+namespace App\Registrars;
+
+use CranleighSchool\DomainExpiry\RegistrarInterface;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
+
+class Namecheap implements RegistrarInterface
+{
+    /**
+     *  Must return a collection of domain names (string), without any schema/protcol or extra data — just the domain name itself.)
+     * eg: ["example.com", "mydomain.co.uk", "anotherdomain.io"]
+     */
+    public function getDomains(): Collection
+    {
+        return Http::get('https://api.namecheap.com/...')
+            ->collect()
+            ->pluck('Name');
+    }
+}
+```
+
+**2. Tag it in your `AppServiceProvider`**
+
+```php
+use App\Registrars\Namecheap;
+
+public function register(): void
+{
+    $this->app->tag([Namecheap::class], 'domain-expiry.registrars');
+}
+```
+
+---
+
 ### Artisan command
 
 ```bash

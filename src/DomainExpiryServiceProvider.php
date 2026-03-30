@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace CranleighSchool\DomainExpiry;
 
+use CranleighSchool\DomainExpiry\Http\Registrars\Gandi;
+use CranleighSchool\DomainExpiry\Http\Registrars\Porkbun;
 use CranleighSchool\DomainExpiry\Livewire\DomainManager;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -16,6 +19,8 @@ class DomainExpiryServiceProvider extends ServiceProvider
             path: __DIR__.'/../config/domain-expiry.php',
             key: 'domain-expiry',
         );
+
+        $this->app->tag([Gandi::class, Porkbun::class], 'domain-expiry.registrars');
 
         $this->app->singleton(WhoisChecker::class, function () {
             $config = config('domain-expiry');
@@ -41,6 +46,11 @@ class DomainExpiryServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->commands([
+            Console\CheckDomainsCommand::class,
+            Console\ImportFromRegistrars::class,
+        ]);
+
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__.'/../config/domain-expiry.php' => config_path('domain-expiry.php'),
@@ -57,11 +67,11 @@ class DomainExpiryServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/css/domain-expiry.css' => public_path('vendor/domain-expiry/domain-expiry.css'),
             ], 'domain-expiry-css');
-            $this->commands([
-                Console\CheckDomainsCommand::class,
-                Console\ImportFromGandi::class,
-            ]);
         }
+
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            $schedule->command('domain-expiry:registrar-import')->daily();
+        });
 
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 

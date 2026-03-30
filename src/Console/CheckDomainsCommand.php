@@ -23,7 +23,7 @@ class CheckDomainsCommand extends Command
 
     public function handle(DomainExpiryService $service): int
     {
-        $domains = $this->option('domain') ?: Domain::active()->pluck('domain')->all();
+        $domains = $this->option('domain') ?: Domain::query()->active()->pluck('domain')->all();
 
         if (empty($domains)) {
             $this->error('No domains configured. Add them via the dashboard or pass --domain=example.com');

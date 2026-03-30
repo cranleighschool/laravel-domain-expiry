@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace CranleighSchool\DomainExpiry;
 
-use Spatie\Rdap\CouldNotFindRdapServer;
 use Spatie\Rdap\Facades\Rdap;
 
 class WhoisChecker
@@ -164,38 +163,40 @@ class WhoisChecker
     // Public API
     // -------------------------------------------------------------------------
 
-    /**
-     * @throws CouldNotFindRdapServer
-     */
     public function check(string $domain): WhoisResult
     {
         $domain = strtolower(trim($domain));
         $domain = preg_replace('/^www\./i', '', $domain);
 
         $tld = $this->extractTld($domain);
-        $server = null;
-        if ($tld === 'me') {
-            $server = $this->servers[$tld] ?? null;
+
+        // Try RDAP first — it's the modern, structured protocol
+        try {
+            $rdap = Rdap::domain($domain);
+
+            if ($rdap !== null) {
+                $expirationDate = $rdap->expirationDate();
+
+                if ($expirationDate !== null) {
+                    return new WhoisResult(
+                        domain: $domain,
+                        tld: $tld,
+                        server: Rdap::dns()->getServerForDomain($domain) ?? 'RDAP',
+                        rawResponse: '',
+                        expiryDate: $expirationDate->toDateTimeImmutable(),
+                        error: null,
+                    );
+                }
+            }
+        } catch (\Throwable) {
+            // RDAP unsupported or failed — fall through to WHOIS
         }
 
+        // Fall back to WHOIS (e.g. .me and other TLDs without RDAP support)
+        $server = $this->servers[$tld] ?? null;
+
         if ($server === null) {
-            // No WHOIS server configured for TLD
-            // Try RDAP
-            $rdap = Rdap::domain($domain);
-            if (is_null($rdap)) {
-                return WhoisResult::error($domain, 'No WHOIS server found, and RDAP says its a non existent domain.');
-            }
-
-            $expirationDate = $rdap->expirationDate();
-
-            return new WhoisResult(
-                domain: $domain,
-                tld: $tld,
-                server: Rdap::dns()->getServerForDomain($domain) ?? 'RDAP',
-                rawResponse: '',
-                expiryDate: $expirationDate->toDateTimeImmutable(),
-                error: null,
-            );
+            return WhoisResult::error($domain, 'No RDAP support and no WHOIS server configured for this TLD.');
         }
 
         $raw = $this->queryServer($domain, $server);
@@ -296,6 +297,13 @@ class WhoisChecker
         return $response !== '' ? $response : null;
     }
 
+    /**
+     * Walk each known expiry-line pattern until one matches, then attempt to
+     * parse the captured date string twice: once as-is, and once with the
+     * trailing token stripped (e.g. "2027-03-15 UTC" → "2027-03-15"), since
+     * some WHOIS servers append a timezone label that DateTimeImmutable cannot
+     * parse natively.
+     */
     private function parseExpiry(string $raw): ?\DateTimeImmutable
     {
         foreach (self::EXPIRY_PATTERNS as $pattern) {

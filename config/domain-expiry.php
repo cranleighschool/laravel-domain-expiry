@@ -1,9 +1,18 @@
 <?php
 
 return [
-
-    'services' => [
-        'gandi' => env('GANDI_ORGANISATION_API_KEY', null),
+    'registrars' => [
+        'gandi' => [
+            'auth' => [
+                'token' => env('GANDI_ORGANISATION_API_KEY', null),
+            ],
+        ],
+        'porkbun' => [
+            'auth' => [
+                'apikey' => env('PORKBUN_API_KEY', null),
+                'secretapikey' => env('PORKBUN_SECRET_API_KEY', null),
+            ]
+        ]
     ],
 
     /*
