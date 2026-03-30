@@ -1,0 +1,110 @@
+.section-header {
+    margin-top: 3rem;
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    margin-bottom: 1.25rem;
+}
+
+.section-header h2 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 500;
+    font-size: 1rem;
+    color: var(--bright);
+    letter-spacing: 0.03em;
+}
+
+.add-domain-form {
+    margin-bottom: 1.5rem;
+}
+
+.form-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.form-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--bright);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 5px 10px;
+    outline: none;
+    width: 220px;
+    transition: border-color 0.15s;
+}
+
+.form-input:focus {
+    border-color: var(--notice);
+}
+
+.form-input::placeholder {
+    color: var(--muted);
+}
+
+.field-error {
+    color: var(--critical);
+    font-size: 10px;
+    letter-spacing: 0.04em;
+}
+
+.empty-state {
+    color: var(--muted);
+    font-size: 12px;
+    font-style: italic;
+    padding: 1rem 0;
+}
+
+.manage-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.manage-table thead th {
+    text-align: left;
+    color: var(--muted);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 400;
+    padding: 0 1rem 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.manage-table tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+}
+
+.manage-table tbody tr:hover {
+    background: var(--surface);
+}
+
+.manage-table tbody td {
+    padding: 0.65rem 1rem 0.65rem 0;
+    vertical-align: middle;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 0;
+    letter-spacing: 0.04em;
+    transition: color 0.15s;
+}
+
+.remove-btn:hover {
+    color: var(--expired);
+}

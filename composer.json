@@ -1,0 +1,58 @@
+{
+    "name": "cranleighschool/domain-expiry",
+    "description": "WHOIS-based domain expiry checker and dashboard for Laravel 12+",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "whois", "domain", "expiry", "dns"],
+    "authors": [
+        {
+            "name": "Cranleigh School",
+            "email": "dev@cranleigh.org"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^12.0",
+        "illuminate/console": "^12.0",
+        "illuminate/database": "^12.0",
+        "illuminate/http": "^12.0",
+        "illuminate/cache": "^12.0",
+        "illuminate/routing": "^12.0",
+        "livewire/livewire": "^3.0",
+        "spatie/laravel-rdap": "^1.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.29",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.0",
+        "pestphp/pest-plugin-laravel": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "CranleighSchool\\DomainExpiry\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CranleighSchool\\DomainExpiry\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "CranleighSchool\\DomainExpiry\\DomainExpiryServiceProvider"
+            ],
+            "aliases": {
+                "DomainExpiry": "CranleighSchool\\DomainExpiry\\Facades\\DomainExpiry"
+            }
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
