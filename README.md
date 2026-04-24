@@ -43,7 +43,7 @@ Open `config/domain-expiry.php` and add your domains:
 
 ### Protect the dashboard
 
-By default the dashboard is publicly accessible at `/domain-expiry`. To restrict it, add middleware to the config:
+By default the dashboard had the middleware `web` and `auth` attached. If you want to amend the middelware you can do that in the config file. Removing `auth` for example will make the dashboard accessible to all. 
 
 ```php
 'dashboard' => [
