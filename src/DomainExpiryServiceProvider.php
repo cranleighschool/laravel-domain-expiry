@@ -20,7 +20,11 @@ class DomainExpiryServiceProvider extends ServiceProvider
             key: 'domain-expiry',
         );
 
-        $this->app->tag([Gandi::class, Porkbun::class], 'domain-expiry.registrars');
+        $this->app->tag([
+            // Current Registrars we are able to import from
+            Gandi::class,
+            Porkbun::class,
+        ], 'domain-expiry.registrars');
 
         $this->app->singleton(WhoisChecker::class, function () {
             $config = config('domain-expiry');
