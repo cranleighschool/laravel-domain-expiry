@@ -28,7 +28,7 @@ return [
     'dashboard' => [
         'enabled' => true,
         'uri' => '/domain-expiry',
-        'middleware' => ['web'],  // e.g. ['web', 'auth']
+        'middleware' => ['web', 'auth'],  // e.g. ['web', 'auth']
     ],
 
     /*
